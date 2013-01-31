@@ -251,8 +251,10 @@
 
   var Presence = CTSUI.Presence = function(opts, args) {
     this.opts = opts || {
-      "server":"localhost:3000"
+      "server":"http://localhost:3000",
+      "path":"/api/v1"
     };
+    this.token = null;
     this.initialize.apply(this, args);
   };
 
@@ -262,8 +264,8 @@
     },
 
     loginAsAnonymous: function() {
-      CTSUI.$.(
-        this.opts.server + "/api/v1/loginAsAnonymous", {
+      CTSUI.$.ajax(
+        this.opts.server + this.opts.path + "loginAsAnonymous", {
           success: this._loginAsAnonymousSucceeded,
           error: this._loginAsAnonymousFailed
         }
@@ -277,11 +279,31 @@
       return false;
     },
 
-    isLoggedIn: function() {
-      return false;
+    isLoggedIn: function(callback) {
+      CTSUI.$.ajax({
+        dataType:"json",
+        url:this.opts.server + this.opts.path + "/user/is_logged_in?callback=?",
+        success:_.bind(function(resp) {
+          this.token = resp.token;
+          callback(resp);
+        }, this) 
+      });
     },
 
-    logout: function() {
+    logout: function(callback) {
+      CTSUI.$.ajax({
+        dataType:"json",
+        type:'POST',
+        url:this.opts.server + this.opts.path + "/user/logout",
+        success:callback,
+        headers:{
+          'X-CSRF-Token': this.token
+        },
+        crossDomain: true,
+        beforeSend: function(xhr) {
+          xhr.withCredentials = true;
+        }
+      });
     },
 
     signup: function() {
@@ -329,12 +351,52 @@
 
   });
 
-  var Reporting = CTSUI.Reporting = function(opts, args) {
+  var Reporting = CTSUI.Reporting = function(presence, opts, args) {
     this.opts = opts || {};
+    this.pesence = presence;
     this.initialize.apply(this, args);
+    this.queue = [];
+    // TODO(eob): Add tick, tock, inc methods.
   };
 
   _.extend(Reporting.prototype, {
+    report: function(name, params) {
+      var r = {};
+      var date = new Date();
+      r["name"] = name;
+      r["params"] = params;
+      r["localTime"] = date.getTime();
+      r["localTimeZoneOffset"] = date.getTimezoneOffset();
+      this.queue[this.queue.length] = r;
+      this.maybeFlushQueue();
+    },
+
+    maybeFlushQueue: function() {
+      this.flushQueue();
+    },
+
+    flushQueue: function() {
+      CTSUI.$.ajax({
+        dataType:"json",
+        type:'POST',
+        url:this.opts.server + this.opts.path + "/report",
+        success:callback,
+        headers:{
+          'X-CSRF-Token': this.token
+        },
+        crossDomain: true,
+        beforeSend: function(xhr) {
+          xhr.withCredentials = true;
+        }
+      });
+
+    },
+
+    _flushQueueSuccess: function(data) {
+    },
+
+    _flushQueueFailed: function(data) {
+    }
   });
 
   var WidgetView = CTSUI.WidgetView = function(opts, args) {

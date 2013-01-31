@@ -1,0 +1,21 @@
+<html>
+  <head>
+    <script src="../../lib//js/jquery.js"></script>
+    <script src="../../lib/js/underscore.js"></script>
+    <script src="../../src/main/js/back-scratch.js"></script>
+  </head>
+  <body>
+    <div id="results">
+    </div>
+    <script>
+    $(function() {
+      window.presence = new CTSUI.Presence();
+      presence.isLoggedIn(function(res) {
+        $("#results").html(res.logged_in);
+        console.log("Is logged in:", res);
+      });
+      
+    });
+    </script>
+  </body>
+</html>
