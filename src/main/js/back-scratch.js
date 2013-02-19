@@ -263,31 +263,18 @@
     initialize: function(args) {
     },
 
-    loginAsAnonymous: function() {
-      CTSUI.$.ajax(
-        this.opts.server + this.opts.path + "loginAsAnonymous", {
+    login: function(callback) {
+      var url = this.opts.server + this.opts.path + "/user/login";
+      CTSUI.$.ajax({
+          type:"POST",
+          dataType:"json",
+          url: url,
+          crossDomain: true,
           success: this._loginAsAnonymousSucceeded,
-          error: this._loginAsAnonymousFailed
+          error: this._loginAsAnonymousFailed,
+          context: this
         }
       );
-    },
-
-    login: function() {
-    },
-
-    isLoggedInAnonymously: function() {
-      return false;
-    },
-
-    isLoggedIn: function(callback) {
-      CTSUI.$.ajax({
-        dataType:"json",
-        url:this.opts.server + this.opts.path + "/user/is_logged_in?callback=?",
-        success:_.bind(function(resp) {
-          this.token = resp.token;
-          callback(resp);
-        }, this) 
-      });
     },
 
     logout: function(callback) {
@@ -306,6 +293,32 @@
       });
     },
 
+    request: function(opts) {
+      if (this.token !== null) {
+        if (typeof opts.data == "undefined") {
+          opts.data = {};
+        }
+        opts.data["auth_token"] = this.token;
+      }
+      CTSUI.$.ajax(opts);
+    },
+
+    isLoggedInAnonymously: function() {
+      return false;
+    },
+
+    isLoggedIn: function(callback) {
+      this.request({
+        dataType:"json",
+        url:this.opts.server + this.opts.path + "/user/is_logged_in?callback=?",
+        success:_.bind(function(resp) {
+          this.token = resp.token;
+          callback(resp);
+        }, this) 
+      });
+    },
+
+
     signup: function() {
     },
 
@@ -316,12 +329,14 @@
      */
     _loginAsAnonymousFailed: function(jqXHR, textStatus, errorThrown) {
       this.trigger("LoginAsAnonymousFailed");
+      callback();
     },
 
     /**
      *
      */
-    _loginAsAnonymousSucceeded: function() {
+    _loginAsAnonymousSucceeded: function(data) {
+      this.token = data.token;
       this.trigger("LoginAsAnonymousSucceeded");
     },
 
