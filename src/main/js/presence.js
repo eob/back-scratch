@@ -47,7 +47,7 @@ _.extend(Presence.prototype, Events, {
       if (typeof opts.data == "undefined") {
         opts.data = {};
       }
-      opts.data["auth_token"] = this.token;
+      opts.data.auth_token = this.token;
     }
     CTSUI.$.ajax(opts);
   },

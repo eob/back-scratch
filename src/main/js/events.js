@@ -56,7 +56,9 @@ var Events = CTSUI.Events = {
   // all events fired.
   on: function(name, callback, context) {
     if (!(eventsApi(this, 'on', name, [callback, context]) && callback)) return this;
-    this._events || (this._events = {});
+    if (typeof this._events  == 'undefined') {
+      this._events = {};
+    }
     var list = this._events[name] || (this._events[name] = []);
     list.push({callback: callback, context: context, ctx: context || this});
     return this;
@@ -91,7 +93,8 @@ var Events = CTSUI.Events = {
     names = name ? [name] : _.keys(this._events);
     for (i = 0, l = names.length; i < l; i++) {
       name = names[i];
-      if (list = this._events[name]) {
+      if (typeof this._events[name] != "undefined") {
+        list = this._events[name];
         events = [];
         if (callback || context) {
           for (j = 0, k = list.length; j < k; j++) {

@@ -10,10 +10,10 @@ _.extend(Reporting.prototype, {
   report: function(name, params) {
     var r = {};
     var date = new Date();
-    r["name"] = name;
-    r["params"] = params;
-    r["localTime"] = date.getTime();
-    r["localTimeZoneOffset"] = date.getTimezoneOffset();
+    r.name = name;
+    r.params = params;
+    r.localTime = date.getTime();
+    r.localTimeZoneOffset = date.getTimezoneOffset();
     this.queue[this.queue.length] = r;
     this.maybeFlushQueue();
   },

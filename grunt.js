@@ -26,7 +26,7 @@ module.exports = function(grunt) {
           "src/main/js/presence.js",
           "src/main/js/reporting.js",
           "src/main/js/widget.js",
-          "src/main/js/fragments/postfix._js",
+          "src/main/js/fragments/postfix._js"
         ],
         dest : "release/back-scratch.js"
       }

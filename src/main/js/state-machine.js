@@ -6,10 +6,10 @@ var StateMachine = CTSUI.StateMachine = {
     this._fsmCurrent = initialState;
     this._fsmArcs = {};
     _.each(arcs, function(arc) {
-      if (! _.contains(this._fsmArcs, arc['from'])) {
-        this._fsmArcs[arc['from']] = {};
+      if (! _.contains(this._fsmArcs, arc.from)) {
+        this._fsmArcs[arc.from] = {};
       }
-      this._fsmArcs[arc['from']][arc['to']] = arc['name'];
+      this._fsmArcs[arc.from][arc.to] = arc.name;
     }, this);
   },
 
@@ -41,5 +41,5 @@ var StateMachine = CTSUI.StateMachine = {
       throw new Error(
           "Can not make transition " + this._fsmCurrent + " -> " + newState);
     }
-  },
+  }
 };
